@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.DecorationModeDao">
+
+    <select id="findAllDecorationMode" resultType="decorationMode">
+        SELECT * FROM decoration_mode
+    </select>
+
+    <select id="findDecorationModeById" resultType="decorationMode">
+        SELECT * FROM decoration_mode WHERE mode_id=#{mode_id}
+    </select>
+
+
+</mapper>

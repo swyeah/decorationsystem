@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                          http://www.springframework.org/schema/beans/spring-beans.xsd
+                          http://www.springframework.org/schema/context
+                          http://www.springframework.org/schema/context/spring-context.xsd
+                          http://www.springframework.org/schema/mvc
+                          http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                          http://www.springframework.org/schema/websocket
+                          http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd
+                          ">
+
+ <mvc:interceptors>
+     <mvc:interceptor>
+         <mvc:mapping path="/**" />
+         <mvc:exclude-mapping path="/login/**" />
+         <mvc:exclude-mapping path="/images/**" />
+         <mvc:exclude-mapping path="/fonts/**" />
+         <mvc:exclude-mapping path="/css/**" />
+         <mvc:exclude-mapping path="/js/**" />
+         <mvc:exclude-mapping path="/vendor/**" />
+         <mvc:exclude-mapping path="/dist/**" />
+         <bean class="com.sise.interceptor.AutorizationInterceptor"/>
+     </mvc:interceptor>
+
+ </mvc:interceptors>
+    <mvc:annotation-driven/>
+    <context:annotation-config/>
+    <!-- websocket处理类 -->
+    <bean id="myHandler" class="com.sise.webSocket.MyWebSocketHandler"/>
+
+    <!-- 握手接口/拦截器 -->
+    <bean id="myInterceptor" class="com.sise.webSocket.HandshakeInterceptor"/>
+
+    <websocket:handlers >
+        <websocket:mapping path="/websocket" handler="myHandler"/>
+        <websocket:handshake-interceptors>
+            <ref bean="myInterceptor"/>
+        </websocket:handshake-interceptors>
+    </websocket:handlers>
+    <!-- 配置websocket消息的最大缓冲区长度 -->
+    <bean class="org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean">
+        <property name="maxTextMessageBufferSize" value="8192"/>
+        <property name="maxBinaryMessageBufferSize" value="8192"/>
+    </bean>
+
+    <!--  注册 sockJS -->
+    <websocket:handlers>
+        <websocket:mapping path="/sockjs/websocket" handler="myHandler"/>
+        <websocket:handshake-interceptors>
+            <ref bean="myInterceptor"/>
+        </websocket:handshake-interceptors>
+        <websocket:sockjs />
+    </websocket:handlers>
+
+
+    <mvc:resources location="/images/" mapping="/images/**"/>
+    <mvc:resources location="/fonts/" mapping="/fonts/**"/>
+    <mvc:resources location="/css/" mapping="/css/**"/>
+    <mvc:resources location="/js/" mapping="/js/**"/>
+    <mvc:resources location="/vendor/" mapping="/vendor/**"/>
+    <mvc:resources location="/dist/" mapping="/dist/**"/>
+    <!-- DispatcherServlet上下文， 只管理@Controller类型的bean， 忽略其他型的bean, 如@Service -->
+    <context:component-scan base-package="com.sise.controller">
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+    <context:component-scan base-package="com.sise.service"/>
+<mvc:annotation-driven/>
+
+
+
+    <!--配置解析器，不配置也可以-->
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver"/>
+
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass"
+                  value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/WEB-INF/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+<!--    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver" p:defaultEncoding="UTF-8"
+          p:maxUploadSize="10485760">
+    </bean>-->
+    <!-- 文件上传配置 -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 上传的最大限制 -->
+        <property name="maxUploadSize" value="209715200" />
+        <!-- 默认编码 -->
+        <property name="defaultEncoding" value="UTF-8" />
+        <!-- 上传文件的解析 -->
+        <property name="resolveLazily" value="true" />
+    </bean>
+</beans>

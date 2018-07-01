@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.MaterialClazzDao">
+
+    <select id="findAllMaterClazz" resultType="materialClazz">
+        SELECT * FROM material_clazz
+    </select>
+
+    <select id="findMaterClazzById" resultType="materialClazz">
+        SELECT * FROM material_clazz WHERE big_id=#{big_id}
+    </select>
+    <select id="findMaterialClazzBySearch" resultType="materialClazz">
+        SELECT * FROM material_clazz
+        <where>
+            <if test="searchContent!=''">
+                big_id LIKE concat('%',#{searchContent},'%')
+                OR big_name LIKE concat('%',#{searchContent},'%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertMaterialClazz" parameterType="materialClazz">
+        INSERT INTO material_clazz(big_name) VALUE (#{bigName})
+    </insert>
+
+    <update id="updateMaterialClazz" parameterType="materialClazz">
+        UPDATE material_clazz SET big_name = #{bigName} WHERE big_id=#{bigId}
+    </update>
+
+    <delete id="delMaterialClazz" parameterType="Integer">
+        DELETE FROM material_clazz WHERE big_id=#{bigId}
+    </delete>
+
+</mapper>

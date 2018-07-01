@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.RegistrationTableDao">
+    <resultMap id="registrationTableMapper" type="registrationTable">
+        <id column="registration_id" property="registrationId"/>
+        <result column="registration_name" property="registrationName"/>
+        <result column="registration_time" property="registrationTime"/>
+        <result column="registration_phone" property="registrationPhone"/>
+        <result column="registration_address" property="registrationAddress"/>
+        <result column="registration_area" property="registrationArea"/>
+        <result column="registration_source" property="registrationSource"/>
+        <result column="status" property="status"/>
+        <result column="user_name" property="userName"/>
+        <result column="business_status" property="businessStatus"/>
+        <result column="tracking_times" property="trackingTimes"/>
+        <result column="notracking_days" property="notrackingDays"/>
+        <result column="warning_times" property="warningTimes"/>
+        <result column="version" property="version"/>
+        <association column="designer_id" property="designer" select="findEmployeeById" javaType="com.sise.po.Employee"/>
+        <association property="employee" column="employee_id" select="findEmployeeById" javaType="com.sise.po.Employee"/>
+        <association property="city" column="city_id" select="selectCityById" javaType="com.sise.po.City"/>
+    </resultMap>
+
+    <resultMap id="registrationTableWithappointmentMapper" type="registrationTable">
+        <id column="registration_id" property="registrationId"/>
+        <result column="registration_name" property="registrationName"/>
+        <result column="registration_time" property="registrationTime"/>
+        <result column="registration_phone" property="registrationPhone"/>
+        <result column="registration_address" property="registrationAddress"/>
+        <result column="registration_area" property="registrationArea"/>
+        <result column="registration_source" property="registrationSource"/>
+        <result column="status" property="status"/>
+        <result column="user_name" property="userName"/>
+        <result column="version" property="version"/>
+        <association property="appointment" column="appointment_id" fetchType="eager"  select="com.sise.dao.AppointmentDao.findAppointmentByRegistrationId"  javaType="appointment"/>
+        <association column="designer_id" property="designer" select="findEmployeeById" fetchType="eager" javaType="com.sise.po.Employee"/>
+        <association property="employee" column="employee_id" select="findEmployeeById" fetchType="eager" javaType="com.sise.po.Employee"/>
+        <association property="city" column="city_id" select="selectCityById" javaType="com.sise.po.City"/>
+    </resultMap>
+
+    <resultMap id="registrationTableWithProjectStatusMapper" type="registrationTable">
+        <id column="registration_id" property="registrationId"/>
+        <result column="registration_name" property="registrationName"/>
+        <result column="registration_time" property="registrationTime"/>
+        <result column="registration_phone" property="registrationPhone"/>
+        <result column="registration_address" property="registrationAddress"/>
+        <result column="registration_area" property="registrationArea"/>
+        <result column="registration_source" property="registrationSource"/>
+        <result column="status" property="status"/>
+        <result column="user_name" property="userName"/>
+        <result column="version" property="version"/>
+        <result column="housepic_status" property="housepicStatus"/>
+        <result column="designerpic_status" property="designerpicStatus"/>
+        <result column="contract_status" property="contractStatus"/>
+        <association column="designer_id" property="designer" select="findEmployeeById" fetchType="eager" javaType="com.sise.po.Employee"/>
+        <association property="employee" column="employee_id" select="findEmployeeById" fetchType="eager" javaType="com.sise.po.Employee"/>
+        <association property="city" column="city_id" select="selectCityById" javaType="com.sise.po.City"/>
+    </resultMap>
+    <resultMap id="registrationTableWithContractMapper" type="registrationTable">
+        <id column="registration_id" property="registrationId"/>
+        <result column="registration_name" property="registrationName"/>
+        <result column="registration_time" property="registrationTime"/>
+        <result column="registration_phone" property="registrationPhone"/>
+        <result column="registration_address" property="registrationAddress"/>
+        <result column="registration_area" property="registrationArea"/>
+        <result column="registration_source" property="registrationSource"/>
+        <result column="status" property="status"/>
+        <result column="user_name" property="userName"/>
+        <result column="version" property="version"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <association column="designer_id" property="designer" select="findEmployeeById" fetchType="eager" javaType="com.sise.po.Employee"/>
+        <association property="employee" column="employee_id" select="findEmployeeById" fetchType="eager" javaType="com.sise.po.Employee"/>
+        <association property="city" column="city_id" select="selectCityById" javaType="com.sise.po.City"/>
+    </resultMap>
+
+
+    <resultMap id="employeeMapper" type="employee">
+        <id column="employee_id" property="employeeId"/>
+        <result column="employee_name" property="employeeName"/>
+        <association property="job" column="job_id" fetchType="eager" javaType="com.sise.po.Job" select="findJobById"/>
+    </resultMap>
+
+    <resultMap id="jobMapper" type="job">
+        <id property="jobId" column="job_id"/>
+        <result column="job_name" property="jobName"/>
+        <association property="department" column="department_id" fetchType="eager" javaType="com.sise.po.Department" select="findDeptById"/>
+    </resultMap>
+
+    <resultMap id="cityMapper" type="city">
+        <id property="cityId" column="city_id"/>
+        <result column="city_name" property="cityName"/>
+        <association property="province" column="province_id" javaType="com.sise.po.Province" select="findProvinceById"/>
+    </resultMap>
+
+    <select id="findAllRegistration" resultMap="registrationTableMapper" >
+        SELECT * FROM registration
+    </select>
+
+    <select id="findRegistrationByStatus" resultMap="registrationTableMapper">
+        SELECT * FROM registration WHERE status = #{status}
+    </select>
+
+    <select id="findRegistrationWithAppointmentByStatus" resultMap="registrationTableWithappointmentMapper">
+        SELECT registration_id,registration_time,registration_name,registration_phone,city_id,
+        registration_address,registration_area ,registration_source,employee_id,designer_id,user_name,version,appointment_id
+        FROM registration   WHERE status = #{status}
+    </select>
+
+
+
+    <select id="findEmployeeById" resultMap="employeeMapper">
+        SELECT employee_id,employee_name,job_id FROM employee WHERE employee_id =#{employee_id}
+    </select>
+
+    <select id="findDeptById" parameterType="Integer" resultType="department">
+        SELECT * FROM department WHERE department_id=#{department_id}
+    </select>
+
+    <select id="findJobById" resultMap="jobMapper">
+        SELECT * FROM job WHERE job_id=#{job_id}
+    </select>
+
+    <select id="selectCityById" resultMap="cityMapper">
+        SELECT * FROM city WHERE city_id = #{city_id}
+    </select>
+
+    <select id="findProvinceById" resultType="province">
+        SELECT * FROM province WHERE province_id =#{province_id}
+    </select>
+
+    <insert id="insertRegistration" parameterType="registrationTable">
+        INSERT INTO registration(registration_time,registration_name,registration_phone,city_id,registration_address,
+                                 registration_area,registration_source,employee_id,designer_id,status,user_name,business_status,tracking_times,notracking_days,warning_times,version)
+                VALUES (#{registrationTime},#{registrationName},#{registrationPhone},#{cityId},#{registrationAddress},
+                #{registrationArea},#{registrationSource},#{employeeId},#{designerId},#{status},
+                    #{userName},#{businessStatus},#{trackingTimes},#{notrackingDays},#{warningTimes},#{version})
+    </insert>
+
+    <update id="updateDesignerByRegistrationId" parameterType="Integer">
+        UPDATE registration SET designer_id = #{designerId},version = #{version}
+        WHERE registration_id = #{registrationId}
+    </update>
+
+    <select id="getVersion" resultType="Integer" >
+        SELECT version FROM registration WHERE registration_id=#{registrationId}
+    </select>
+
+    <select id="findRegistrationById" resultMap="registrationTableMapper">
+        SELECT * FROM registration WHERE registration_id=#{registrationId}
+    </select>
+
+    <select id="findRegistrationWithAppointmentById" resultMap="registrationTableWithappointmentMapper">
+        SELECT * FROM registration WHERE registration_id=#{registrationId}
+    </select>
+
+    <update id="updateInfo" parameterType="registrationTable">
+        UPDATE registration set business_status=#{businessStatus},tracking_times=#{trackingTimes},notracking_days=#{notrackingDays},warning_times=#{warningTimes} WHERE registration_id=#{registrationId}
+    </update>
+
+    <update id="updateStatus" parameterType="Integer">
+        UPDATE registration set status = #{status} WHERE registration_id = #{registrationId}
+    </update>
+
+    <update id="updateAppointmentId" parameterType="Integer">
+        UPDATE registration set appointment_id = #{appointmentId} WHERE registration_id=#{registrationId}
+    </update>
+
+    <select id="findAppointmentIdById" parameterType="Integer" resultType="Integer">
+        SELECT appointment_id FROM registration WHERE registration_id=#{registrationId}
+    </select>
+
+
+    <select id="findRegistrationByStatusAndSearchContent" parameterType="searchContent" resultMap="registrationTableMapper">
+        SELECT registration_id,registration_time,registration_name,registration_phone,r.city_id,
+        registration_address,registration_area ,registration_source,employee_id,designer_id,user_name,business_status,tracking_times,notracking_days,warning_times,version
+        FROM registration r JOIN city c ON r.city_id = c.city_id JOIN province p ON p.province_id = c.province_id WHERE r.status = #{status}
+        <if test="startTime!=null">
+            AND registration_time >=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            AND registration_time &lt;= #{endTime}
+        </if>
+        <if test="sname!=''">
+            AND registration_name LIKE concat('%',#{sname},'%')
+        </if>
+        <if test="provinceId!=0">
+            AND p.province_Id= #{provinceId}
+        </if>
+        <if test="provinceId!=0  and cityId!=0">
+            AND c.city_id = #{cityId}
+        </if>
+        <if test="employeeId!=0 ">
+            AND (r.employee_id = #{employeeId} OR designer_id = #{employeeId})
+        </if>
+        ORDER BY registration_id DESC
+    </select>
+
+    <select id="findRegistrationWithAppByStatusAndSearchContent" parameterType="searchContent" resultMap="registrationTableWithappointmentMapper">
+        SELECT registration_id,registration_time,registration_name,registration_phone,r.city_id,
+        registration_address,registration_area ,registration_source,employee_id,designer_id,user_name,version,appointment_id
+        FROM registration r JOIN city c ON r.city_id = c.city_id JOIN province p ON p.province_id = c.province_id WHERE r.status = #{status}
+        <if test="startTime!=null">
+            AND registration_time >=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            AND registration_time &lt;= #{endTime}
+        </if>
+        <if test="sname!=''">
+            AND registration_name LIKE concat('%',#{sname},'%')
+        </if>
+        <if test="provinceId!=0">
+            AND p.province_Id= #{provinceId}
+        </if>
+        <if test="provinceId!=0  and cityId!=0">
+            AND c.city_id = #{cityId}
+        </if>
+        <if test="employeeId!=0 ">
+            AND (r.employee_id = #{employeeId} OR designer_id = #{employeeId})
+        </if>
+        ORDER BY registration_id DESC
+    </select>
+
+    <select id="findRegistrationWithProjectStatusByStatusAndSearchContent" parameterType="searchContent" resultMap="registrationTableWithProjectStatusMapper">
+        SELECT r.registration_id,registration_time,registration_name,registration_phone,r.city_id,
+        registration_address,registration_area ,registration_source,employee_id,designer_id,user_name,r.version,h.status AS housepic_status,d.status AS designerpic_status,
+        ct.status AS contract_status
+        FROM registration r JOIN city c ON r.city_id = c.city_id JOIN province p ON p.province_id = c.province_id LEFT JOIN housepic h ON h.registration_id = r.registration_id
+        LEFT JOIN designerpic d ON d.registration_id = r.registration_id LEFT JOIN contract ct ON ct.registration_id= r.registration_id
+        WHERE r.status = #{status}
+        <if test="startTime!=null">
+            AND registration_time >=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            AND registration_time &lt;= #{endTime}
+        </if>
+        <if test="sname!=''">
+            AND registration_name LIKE concat('%',#{sname},'%')
+        </if>
+        <if test="provinceId!=0">
+            AND p.province_Id= #{provinceId}
+        </if>
+        <if test="provinceId!=0  and cityId!=0">
+            AND c.city_id = #{cityId}
+        </if>
+        <if test="employeeId!=0">
+            AND (r.employee_id = #{employeeId} OR designer_id = #{employeeId})
+        </if>
+        ORDER BY r.registration_id DESC
+    </select>
+
+    <select id="findRegistrationIdByUserName" resultType="Integer">
+        SELECT registration_id FROM registration WHERE user_name = #{userName}
+    </select>
+
+    <select id="findRegistrationByUserName" resultMap="registrationTableMapper">
+        SELECT * FROM registration WHERE user_name = #{userName}
+    </select>
+
+    <select id="finduserNameByHousepicId" resultType="String">
+        SELECT r.user_name FROM registration r JOIN housepic h ON h.registration_id = r.registration_id WHERE h.housepic_id = #{housepicId}
+    </select>
+
+    <select id="finduserNameByDesignerpicId" resultType="String">
+        SELECT r.user_name FROM registration r JOIN designerpic d ON d.registration_id = r.registration_id WHERE d.designerpic_id = #{designerpicId}
+    </select>
+
+    <select id="finduserNameByContractId" resultType="String">
+        SELECT r.user_name FROM registration r JOIN contract c ON c.registration_id = r.registration_id WHERE c.contract_id=#{contractId}
+    </select>
+
+    <select id="findRegistrationwithContractByStatusAndSearchContent" parameterType="searchContent" resultMap="registrationTableMapper">
+        SELECT r.registration_id,registration_time,registration_name,registration_phone,r.city_id,
+        registration_address,registration_area ,registration_source,employee_id,designer_id,user_name,r.version,cn.start_time,cn.end_time
+        FROM registration r JOIN city c ON r.city_id = c.city_id JOIN province p ON p.province_id = c.province_id LEFT JOIN contract cn ON cn.registration_id = r.registration_id WHERE r.status = #{status}
+        <if test="startTime!=null">
+            AND registration_time >=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            AND registration_time &lt;= #{endTime}
+        </if>
+        <if test="sname!=''">
+            AND registration_name LIKE concat('%',#{sname},'%')
+        </if>
+        <if test="provinceId!=0">
+            AND p.province_Id= #{provinceId}
+        </if>
+        <if test="provinceId!=0  and cityId!=0">
+            AND c.city_id = #{cityId}
+        </if>
+        <if test="employeeId!=0">
+            AND (r.employee_id = #{employeeId} OR designer_id = #{employeeId})
+        </if>
+        ORDER BY r.registration_id DESC
+    </select>
+
+    <select id="findRegistrationwithGuaranteeByStatusAndSearchContent" resultMap="registrationTableWithContractMapper">
+        SELECT r.registration_id,registration_time,registration_name,registration_phone,r.city_id,
+        registration_address,registration_area ,registration_source,employee_id,designer_id,user_name,r.version,cn.start_time,cn.end_time
+        FROM registration r JOIN city c ON r.city_id = c.city_id JOIN province p ON p.province_id = c.province_id LEFT JOIN guarantee cn ON cn.registration_id = r.registration_id WHERE r.status = #{status}
+        <if test="startTime!=null">
+            AND registration_time >=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            AND registration_time &lt;= #{endTime}
+        </if>
+        <if test="sname!=''">
+            AND registration_name LIKE concat('%',#{sname},'%')
+        </if>
+        <if test="provinceId!=0">
+            AND p.province_Id= #{provinceId}
+        </if>
+        <if test="provinceId!=0  and cityId!=0">
+            AND c.city_id = #{cityId}
+        </if>
+        <if test="employeeId!=0">
+            AND ( r.employee_id = #{employeeId} OR designer_id = #{employeeId})
+        </if>
+        ORDER BY r.registration_id DESC
+    </select>
+
+    <delete id="delRegistrationTableById" parameterType="Integer">
+        DELETE FROM registration WHERE registration_id = #{registrationId}
+    </delete>
+    
+    <update id="updateUserNameByRegistrationId" parameterType="map">
+        UPDATE registration set user_name = #{userName} where registration_id=#{registrationId}
+    </update>
+
+    <select id="findUserNameByRegistrationId" resultType="String">
+        SELECT user_name FROM registration WHERE registration_id=#{registrationId}
+    </select>
+    
+    
+</mapper>

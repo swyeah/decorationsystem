@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.AppointmentDao">
+    <resultMap id="appointmentMapper" type="appointment">
+        <id column="appointment_id" property="appointmentId"/>
+        <result column="appointment_address" property="appointmentAddress"/>
+        <result column="appointment_time" property="appointmentTime"/>
+        <result column="registration_id" property="registrationId"/>
+        <result column="finish_status" property="finishStatus"/>
+    </resultMap>
+
+    <select id="findAppointmentByRegistrationId" resultMap="appointmentMapper">
+        SELECT appointment_id,registration_id,appointment_address,appointment_time,finish_status FROM appointment WHERE appointment_id=#{appointment_id}
+    </select>
+
+    <select id="findAppointmentAllByRegistrationId" resultMap="appointmentMapper">
+        SELECT appointment_id,registration_id,appointment_address,appointment_time,finish_status FROM  appointment WHERE registration_id = #{registrationId} ORDER BY appointment_id DESC
+    </select>
+
+    <insert id="insertAppointment" parameterType="appointment" useGeneratedKeys="true" keyProperty="appointmentId">
+        INSERT INTO appointment(appointment_time,appointment_address,designer_id,registration_id,finish_status)
+        VALUES (#{appointmentTime},#{appointmentAddress} ,#{designerId},#{registrationId},TRUE )
+    </insert>
+
+    <update id="updateAppointment" parameterType="appointment" useGeneratedKeys="true" keyProperty="appointmentId">
+        UPDATE appointment SET appointment_time=#{appointmentTime},appointment_address=#{appointmentAddress},finish_status=TRUE WHERE appointment_id=#{appointmentId}
+    </update>
+
+
+    <delete id="deleteAppointment" parameterType="Integer">
+        DELETE FROM appointment WHERE appointment_id=#{appointmentId}
+    </delete>
+
+    <select id="findAppointmentById" resultMap="appointmentMapper">
+        SELECT appointment_id,appointment_address,appointment_time,finish_status FROM  appointment WHERE appointment_id = #{appointmentId}
+    </select>
+
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.DesignerpicDao">
+    <resultMap id="designerpicMapper" type="designerpic">
+        <id column="designerpic_id" property="designerpicId"/>
+        <result property="designerpicName" column="designerpic_name"/>
+        <result column="designerpic_describe" property="designerpicDescribe"/>
+        <result column="designerpic_money" property="designerpicMoney"/>
+        <result column="registration_id" property="registrationId"/>
+        <result column="upload_time" property="uploadTime"/>
+        <result column="status" property="status"/>
+        <association property="houseType" column="house_id" select="com.sise.dao.HouseTypeDao.searchHouseTypeById" javaType="houseType"/>
+        <association property="areaType" column="area_id" select="com.sise.dao.AreaTypeDao.searchAreaTypeById" javaType="areaType"/>
+        <association property="decorationStyle" column="style_id" select="com.sise.dao.DecorationStyleDao.findDecorationStyleById" javaType="decorationStyle"/>
+    </resultMap>
+
+    <select id="findDesignerpicByRegistrationId" resultMap="designerpicMapper">
+        SELECT * FROM designerpic WHERE registration_id = #{registrationId}
+    </select>
+
+    <insert id="insertDesigner" parameterType="designerpic">
+        INSERT INTO designerpic(designerpic_money, designerpic_describe, designerpic_name, style_id, house_id, area_id, registration_id, upload_time)
+                VALUES (#{designerpicMoney},#{designerpicDescribe},#{designerpicName},#{decorationStyle.styleId},#{houseType.houseId},#{areaType.areaId},
+                #{registrationId},#{uploadTime})
+    </insert>
+
+    <insert id="insertDesignerpicFile" parameterType="designerpicFile">
+        INSERT  INTO designerpic_file(file_name, file_url, designerpic_id) VALUES (#{fileName},#{fileUrl},#{designerpicId})
+    </insert>
+    
+    <select id="findAllDesignerpicFileByDesignerId" resultType="designerpicFile">
+        SELECT * FROM designerpic_file WHERE designerpic_id = #{designerpicId}
+    </select>
+    
+    <update id="updateDescribeById" parameterType="map">
+        UPDATE designerpic_file SET file_describe =#{fileDescribe} WHERE file_id =#{fileId}
+    </update>
+
+    <delete id="delDesignerpicByDesignerpicId" parameterType="Integer"  >
+        DELETE FROM designerpic WHERE designerpic_id =#{designerpicId}
+    </delete>
+
+    <delete id="delDesignerpicFileByDesignerpicId" parameterType="Integer">
+        DELETE FROM designerpic_file WHERE designerpic_id =#{designerpicId}
+    </delete>
+
+    <update id="updateDesignerpicByDesignerpicId" parameterType="designerpic">
+        UPDATE designerpic SET designerpic_describe=#{designerpicDescribe},designerpic_money=#{designerpicMoney},designerpic_name=#{designerpicName},
+            upload_time=#{uploadTime},version = #{version},style_id=#{decorationStyle.styleId},house_id=#{houseType.houseId},
+            area_id = #{areaType.areaId} , status=#{status} WHERE designerpic_id =#{designerpicId}
+    </update>
+
+    <select id="getVersionByDesignerpicId" resultType="Integer">
+        SELECT version FROM designerpic WHERE designerpic_id=#{designerpicId}
+    </select>
+
+    <select id="findAllDesignerpic" resultMap="designerpicMapper">
+        SELECT d.* FROM designerpic d JOIN registration r ON r.registration_id = d.registration_id WHERE 1=1
+        <if test="startTime!=null">
+            AND d.upload_time >=#{startTime}
+        </if>
+        <if test="endTime!=null">
+            AND d.upload_time &lt;= #{endTime}
+        </if>
+        <if test="designerpicName!=''">
+            AND d.designerpic_name LIKE concat('%',#{designerpicName},'%')
+        </if>
+        <if test="houseId!=0">
+            AND d.house_id= #{houseId}
+        </if>
+        <if test="areaId!=0 ">
+            AND d.area_id = #{areaId}
+        </if>
+        <if test="styleId!=0 ">
+            AND d.style_id = #{styleId}
+        </if>
+        <if test="employeeId!=0">
+            AND r.designer_id = #{employeeId}
+        </if>
+    </select>
+
+    <update id="updateStatusByDesignerpicId" parameterType="Integer">
+        UPDATE designerpic SET status = #{status} WHERE designerpic_id=#{designerpicId}
+    </update>
+
+
+</mapper>

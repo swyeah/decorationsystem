@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.InspectionReportDao">
+
+    <resultMap id="inspectionReportMapper" type="inspectionReport">
+        <id property="reportId" column="report_id"/>
+        <result property="reportStatus" column="report_status"/>
+        <result property="version" column="version"/>
+        <result property="registrationId" column="registration_id"/>
+        <result property="uploadTime" column="upload_time"/>
+        <association property="employee" column="employee_id" select="com.sise.dao.EmployeeDao.findEmployeeById"/>
+    </resultMap>
+
+
+    <insert id="insertInspectionReport" parameterType="inspectionReport" useGeneratedKeys="true" keyProperty="reportId">
+        INSERT INTO inspection_report( report_status, upload_time, registration_id, employee_id) VALUES (#{reportStatus},#{uploadTime},#{registrationId},#{employee.employeeId})
+    </insert>
+
+    <update id="updateInspectionReport" parameterType="inspectionReport">
+        UPDATE inspection_report SET report_status=#{reportStatus},employee_id=#{employee.employeeId} ,upload_time=#{uploadTime},version=#{version} WHERE registration_id=#{registrationId}
+    </update>
+
+    <delete id="delInspectionReport" parameterType="Integer">
+        DELETE FROM inspection_report WHERE registration_id=#{registrationId};
+    </delete>
+
+    <select id="findInspectionReportByRegistrationId" resultMap="inspectionReportMapper">
+        SELECT  * FROM inspection_report WHERE registration_id=#{registrationId}
+    </select>
+
+    <insert id="insertInspectionReportPic" parameterType="inspectionReportPic">
+        INSERT inspection_report_pic(file_name, file_url, report_id) VALUES (#{fileName},#{fileUrl},#{reportId})
+    </insert>
+
+    <delete id="delInspectionReportPicByReportId" parameterType="Integer">
+        DELETE FROM inspection_report_pic WHERE report_id=#{reportId}
+    </delete>
+
+    <select id="findInspectionReportpicByReportId" resultType="inspectionReportPic">
+        SELECT * FROM inspection_report_pic WHERE report_id = #{reportId}
+    </select>
+
+    <select id="getInspectionReportVersionByRegistrationId" resultType="Integer">
+        SELECT version FROM inspection_report WHERE registration_id = #{registrationId}
+    </select>
+
+
+</mapper>

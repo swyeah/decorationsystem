@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.CancelTableDao">
+    <resultMap id="cancelTableMapper" type="cancelTable">
+        <id column="cancel_id" property="cancelId"/>
+        <result column="cancel_content" property="cancelContent"/>
+        <result column="cancel_time" property="cancelTime"/>
+        <result column="registration_Id" property="registrationId"/>
+        <result column="delete_time" property="deleteTime"/>
+        <result column="cancel_status" property="cancelStatus"/>
+        <association property="employee" column="employee_id" fetchType="eager" select="com.sise.dao.RegistrationTableDao.findEmployeeById" javaType="com.sise.po.Employee"/>
+    </resultMap>
+    
+    <insert id="insertCancelTable" parameterType="cancelTable">
+        INSERT INTO cancel_table(cancel_content,cancel_time,employee_id,registration_id,cancel_status) VALUES (#{cancelContent},#{cancelTime},#{employeeId},#{registrationId},#{cancelStatus})
+    </insert>
+
+    <select id="findCancelTableByRegistrationId" resultMap="cancelTableMapper">
+        SELECT  * FROM  cancel_table WHERE registration_id = #{registrationId}
+    </select>
+
+    <delete id="delCancelTableByRegistrationId" parameterType="Integer">
+        DELETE FROM cancel_table WHERE registration_id=#{registrationId}
+    </delete>
+
+</mapper>

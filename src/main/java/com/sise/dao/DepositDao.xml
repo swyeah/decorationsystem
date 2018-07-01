@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.DepositDao">
+
+    <insert id="insertDeposit" parameterType="deposit">
+        INSERT INTO deposit(deposit_time,deposit_money,deposit_url,deposit_describe,registration_id,filename,upload_time,employee_id)
+                VALUES (#{depositTime},#{depositMoney},#{depositUrl},#{depositDescribe},#{registrationId},#{filename},#{uploadTime},#{employeeId})
+    </insert>
+
+    <select id="findDepositByRegistrationId" resultType="deposit">
+        SELECT * FROM deposit WHERE registration_id = #{registrationId}
+    </select>
+
+    <delete id="delDepositByRegistrationId" parameterType="Integer">
+        DELETE FROM deposit WHERE registration_id = #{registrationId}
+    </delete>
+
+
+    <update id="updateDepositById" parameterType="deposit">
+        UPDATE deposit SET deposit_time=#{depositTime},deposit_money=#{depositMoney},deposit_url=#{depositUrl},deposit_describe=#{depositDescribe},filename=#{filename},upload_time=#{uploadTime},employee_id=#{employeeId} WHERE deposit_id=#{depositId}
+    </update>
+
+    <select id="getUploadTimeById" resultType="Date">
+        SELECT upload_time FROM deposit WHERE deposit_id = #{depositId}
+    </select>
+</mapper>

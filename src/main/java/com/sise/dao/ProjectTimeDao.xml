@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.ProjectTimeDao">
+<resultMap id="progressContentMapper" type="progressContent">
+    <id column="progress_id" property="progressId"/>
+    <result column="progress_title" property="progressTitle"/>
+    <result column="progress_content" property="progressContent"/>
+    <result column="project_id" property="projectId"/>
+    <result column="version" property="version"/>
+    <result column="upload_time" property="uploadTime"/>
+    <association property="employee" column="employee_id" select="com.sise.dao.EmployeeDao.findEmployeeById"/>
+</resultMap>
+
+    <resultMap id="progressContentTitleMapper" type="progressContent">
+        <id column="progress_id" property="progressId"/>
+        <result column="progress_title" property="progressTitle"/>
+        <result column="project_id" property="projectId"/>
+    </resultMap>
+
+   <insert id="insertProjectTime" parameterType="projectTime" keyProperty="projectId" useGeneratedKeys="true">
+       INSERT INTO project_time(project_day, registrationId) VALUES (#{projectDay},#{registrationId})
+   </insert>
+
+    <select id="findProjectTimeBySearch" parameterType="map" resultType="projectTime">
+        SELECT * FROM project_time WHERE registrationId = #{registrationId}
+        <if test="startTime!=''">
+            AND project_day>=#{startTime}
+        </if>
+        <if test="endTime!=''">
+            AND project_day &lt;=#{endTime}
+        </if>
+        order BY project_day DESC
+    </select>
+
+    <delete id="delProjectTime" parameterType="Integer">
+        DELETE FROM project_time WHERE project_id=#{projectId}
+    </delete>
+
+    <update id="updateProjectTime" parameterType="projectTime">
+        UPDATE project_time SET project_day=#{projectDay},registrationId=#{registrationId} WHERE project_id=#{projectId}
+    </update>
+
+    <insert id="insertProgressContent" parameterType="progressContent">
+        INSERT INTO progress_content(progress_title, progress_content, employee_id, project_id,upload_time) VALUES (#{progressTitle},#{progressContent},#{employee.employeeId},#{projectId},#{uploadTime})
+    </insert>
+
+    <delete id="delProgressContentByProgressContentId" parameterType="Integer">
+        DELETE FROM progress_content WHERE progress_id = #{progressId}
+    </delete>
+
+    <delete id="delProgressContentByProjectId" parameterType="Integer">
+        DELETE FROM progress_content WHERE project_id = #{projectId}
+    </delete>
+
+    <update id="updateProgressContent" parameterType="progressContent">
+        UPDATE progress_content SET project_id=#{projectId},progress_content=#{progressContent},progress_title=#{progressTitle},employee_id = #{employee.employeeId},version=#{version},upload_time=#{uploadTime} WHERE progress_id=#{progressId}
+    </update>
+
+    <select id="findProgressContentByProjectId" resultMap="progressContentMapper">
+        SELECT * FROM progress_content WHERE project_id=#{projectId}
+    </select>
+
+
+    <select id="findProjectTimeByProjectDay" parameterType="projectTime" resultType="projectTime">
+        SELECT * FROM project_time WHERE project_day=#{projectDay} AND registrationId = #{registrationId}
+    </select>
+
+    <select id="getProgressContentVersionByProgressId" resultType="Integer">
+        SELECT version FROM progress_content WHERE progress_id=#{progressId}
+    </select>
+
+    <select id="findProgressContentByProgressId" resultMap="progressContentMapper">
+        SELECT * FROM progress_content WHERE progress_id = #{progressId}
+    </select>
+
+    <select id="findAllProgressContentTitleByProjectId" resultMap="progressContentTitleMapper">
+        SELECT progress_id,project_id,progress_title FROM progress_content WHERE project_id=#{projectId}
+    </select>
+
+    <select id="findProjectTimeByProjectId" resultType="projectTime">
+        SELECT * FROM project_time WHERE project_id=#{projectId}
+    </select>
+
+</mapper>

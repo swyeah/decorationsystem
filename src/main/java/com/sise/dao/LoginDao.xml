@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.LoginDao">
+    <resultMap id="consumerMapper" type="com.sise.po.Consumer">
+        <id property="consId" column="cons_id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <resultMap id="employeeMapper" type="employee">
+        <id column="employee_id" property="employeeId"/>
+        <result column="employee_name" property="employeeName"/>
+        <association property="job" column="job_id" fetchType="eager" javaType="com.sise.po.Job" select="findJobById"/>
+    </resultMap>
+
+    <resultMap id="jobMapper" type="job">
+        <id property="jobId" column="job_id"/>
+        <result column="job_name" property="jobName"/>
+        <association property="department" fetchType="eager"  column="department_id" javaType="com.sise.po.Department" select="findDeptById"/>
+        <collection property="myAuths" column="job_id" select="findMyAuthsByJobId" ofType="myAuth"/>
+    </resultMap>
+
+    <select id="findMyAuthsByJobId" resultType="myAuth">
+        SELECT m.auth_id , m.auth_name FROM myauth m JOIN permission p ON m.auth_id = p.auth_id WHERE p.job_id = #{job_id}
+    </select>
+
+    <select id="findDeptById" resultType="department">
+        SELECT * FROM department WHERE department_id=#{department_id}
+    </select>
+
+    <select id="findJobById" resultMap="jobMapper">
+        SELECT * FROM job WHERE job_id=#{job_id}
+    </select>
+
+    <select id="searchByConsumer" resultMap="consumerMapper">
+    select *
+    from consumer
+    where user_name=#{userName} AND  password=#{password}
+    </select>
+
+
+    <select id="searchByEmployee" resultMap="employeeMapper">
+        select employee_id ,employee_name,job_id
+        from employee
+        where employee_id = #{employeeId} AND  password=#{password}
+    </select>
+
+    <select id="searchByName" resultType="String">
+        select name
+        from consumer
+        where name=#{name}
+    </select>
+    <select id="searchByUserName" resultType="String">
+        select user_name
+        from consumer
+        where user_name=#{userName}
+    </select>
+    <insert id="insertConsumer" keyProperty="consId" useGeneratedKeys="true" parameterType="com.sise.po.Consumer">
+        insert INTO consumer(user_name, password, name,  birth, id_card, address, email, phone,registration_time)
+        VALUES(#{userName},#{password},#{name},
+        #{birth}, #{idCard}, #{address}, #{email}, #{phone},#{registrationTime})
+    </insert>
+
+
+
+</mapper>

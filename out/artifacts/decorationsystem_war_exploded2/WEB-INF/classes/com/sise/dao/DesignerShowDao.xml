@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.DesignerShowDao">
+    <resultMap id="designerShowMapper" type="designerShow">
+        <id column="show_id" property="showId"/>
+        <result column="show_title" property="showTitle"/>
+        <result column="show_titlepic" property="showTitlepic"/>
+        <result column="show_content" property="showContent"/>
+        <result column="upload_time" property="uploadTime"/>
+        <result column="employee_id" property="employeeId"/>
+        <association property="houseType" column="house_id" select="com.sise.dao.HouseTypeDao.searchHouseTypeById" javaType="houseType"/>
+        <association property="areaType" column="area_id" select="com.sise.dao.AreaTypeDao.searchAreaTypeById" javaType="areaType"/>
+        <association property="decorationStyle" column="style_id" select="com.sise.dao.DecorationStyleDao.findDecorationStyleById" javaType="decorationStyle"/>
+
+    </resultMap>
+
+    <insert id="insertDesignerShow" parameterType="designerShow" useGeneratedKeys="true" keyProperty="showId">
+        INSERT INTO designer_show(show_title, show_content, style_id, house_id, area_id, employee_id, upload_time)
+        VALUES(#{showTitle},#{showContent},#{styleId},#{houseId},#{areaId},#{employeeId},#{uploadTime})
+    </insert>
+
+    <insert id="insertDesignerShowpic" parameterType="designerShowpic">
+        INSERT INTO designer_showpic(file_url, show_id) VALUES (#{fileUrl},#{showId})
+    </insert>
+
+    <update id="updateDesignerShow" parameterType="designerShow">
+        UPDATE designer_show SET show_title=#{showTitle},house_id=#{houseId},
+            style_id=#{styleId},area_id=#{areaId},upload_time=#{uploadTime} WHERE show_id=#{showId}
+    </update>
+
+    <delete id="delDesignerShowByShowId" parameterType="Integer">
+        DELETE FROM designer_show WHERE show_id=#{showId}
+    </delete>
+
+    <delete id="delDesignerShowpicByShowId" parameterType="Integer">
+        DELETE  FROM designer_showpic WHERE show_id=#{showId}
+    </delete>
+
+    <select id="getCountPraiseByShowId" resultType="Integer">
+        SELECT count(praise_show) FROM praise WHERE praise_show = #{showId}
+    </select>
+
+    <select id="getCountCollectionByShowId" resultType="Integer">
+        SELECT count(collection_show) FROM collection WHERE collection_show = #{showId}
+    </select>
+
+    <insert id="insertPraise" parameterType="praise">
+        INSERT INTO praise(praise_man, praise_show) VALUES (#{praiseMan},#{praiseShow})
+    </insert>
+
+    <insert id="insertCollectionShow" parameterType="collectionShow">
+        INSERT INTO collection(collection_man, collection_show) VALUES (#{collectionMan},#{collectionShow})
+    </insert>
+
+    <update id="updateTitlePic" parameterType="map">
+        UPDATE designer_show set show_titlepic = #{showTitlepic} WHERE show_id = #{showId}
+    </update>
+
+
+    <select id="findDesignerShowByShowId" resultMap="designerShowMapper">
+        SELECT  * FROM designer_show WHERE show_id = #{showId}
+    </select>
+
+    <delete id="delCollectShow" parameterType="Integer">
+        DELETE FROM collection WHERE collection_show = #{showId}
+    </delete>
+
+    <delete id="delPraise" parameterType="Integer">
+        DELETE FROM praise WHERE praise_show = #{showId}
+    </delete>
+
+    <select id="findDesignerByEmployeeId" resultMap="designerShowMapper">
+    SELECT * FROM designer_show WHERE 1=1
+    <if test="sname!=''">
+        AND show_title LIKE concat('%',#{sname},'%')
+    </if>
+    <if test="houseId!=0">
+        AND house_id= #{houseId}
+    </if>
+    <if test="areaId!=0 ">
+        AND area_id = #{areaId}
+    </if>
+    <if test="styleId!=0 ">
+        AND style_id = #{styleId}
+    </if>
+    <if test="employeeId!=0">
+        AND employee_id = #{employeeId}
+    </if>
+    ORDER BY upload_time DESC
+</select>
+
+    <select id="findDesignerToIndex" resultMap="designerShowMapper">
+        SELECT * FROM designer_show WHERE 1=1
+        <if test="sname!=''">
+            AND show_title LIKE concat('%',#{sname},'%')
+        </if>
+        <if test="houseId!=0">
+            AND house_id= #{houseId}
+        </if>
+        <if test="areaId!=0 ">
+            AND area_id = #{areaId}
+        </if>
+        <if test="styleId!=0 ">
+            AND style_id = #{styleId}
+        </if>
+        ORDER BY upload_time DESC
+    </select>
+
+    <select id="findPraiseByShowId" resultType="praise">
+        SELECT * FROM praise WHERE praise_show = #{praiseShow} AND praise_man = #{praiseMan}
+    </select>
+
+    <select id="findCollectByShowId" resultType="collectionShow">
+        SELECT * FROM collection WHERE collection_show = #{collectionShow} AND collection_man = #{collectionMan}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.EmployeeDao">
+
+    <resultMap id="employeeMapper" type="employee">
+        <id column="employee_id" property="employeeId"/>
+        <result column="employee_name" property="employeeName"/>
+        <association property="job" column="job_id" fetchType="eager" javaType="com.sise.po.Job" select="findJobById"/>
+    </resultMap>
+
+    <resultMap id="designerMapper" type="employee">
+        <id column="employee_id" property="employeeId"/>
+        <result column="employee_name" property="employeeName"/>
+        <association property="job" column="job_id" fetchType="eager" select="findJobById"/>
+    </resultMap>
+
+    <resultMap id="jobMapper" type="job">
+        <id property="jobId" column="job_id"/>
+        <result column="job_name" property="jobName"/>
+        <association property="department" fetchType="eager"  column="department_id" javaType="com.sise.po.Department" select="findDeptById"/>
+    </resultMap>
+
+    <select id="findAllDesigner" resultMap="designerMapper" >
+        SELECT e.employee_id,e.employee_name,e.job_id FROM employee e,job j,department d WHERE e.job_id = j.job_id
+            AND j.department_id = d.department_id AND d.department_id =#{deptId}
+    </select>
+
+    <select id="findEmployeeById" resultMap="employeeMapper">
+        SELECT employee_id,employee_name,job_id FROM employee WHERE employee_id =#{employee_id}
+    </select>
+
+    <select id="findDeptById" resultType="department">
+        SELECT * FROM department WHERE department_id=#{department_id}
+    </select>
+
+    <select id="findJobById" resultMap="jobMapper">
+        SELECT * FROM job WHERE job_id=#{job_id}
+    </select>
+
+    <select id="searchEmployBySearch" resultMap="employeeMapper">
+        SELECT e.employee_id,e.employee_name,e.job_id FROM employee e LEFT JOIN job j ON e.job_id = j.job_id LEFT JOIN department d ON
+       j.department_id = d.department_id WHERE
+         e.employee_id LIKE concat('%',#{search},'%') AND  j.department_id =#{deptId} or e.employee_name LIKE concat('%',#{search},'%') AND  j.department_id =#{deptId}
+    </select>
+
+    <insert id="insertEmployee" parameterType="Employee">
+        INSERT INTO employee(employee_name,employee_birth,employee_idCard,joined_date,job_id)
+        VALUES (#{employeeName},#{employeeBirth},#{employeeIdCard},#{joinedDate},#{job.jobId})
+    </insert>
+
+    <select id="findEmployeepasswordByEmployeeId" resultType="String">
+        SELECT password FROM employee WHERE employee_id = #{employeeId}
+    </select>
+
+    <update id="updateEmployeepasswordByEmployeeId" parameterType="map">
+        UPDATE employee SET password=#{password} WHERE employee_id = #{employeeId}
+    </update>
+
+    <select id="findOneNoWorkingOnRegistrationFirstStatus" resultType="Integer">
+    select e.employee_id from employee e JOIN job j ON j.job_id = e.job_id where e.job_id=10001 and e.employee_id  not in (select DISTINCT employee_id from registration WHERE status=1 and employee_id is not null ) LIMIT 1
+    </select>
+
+    <select id="findMinOneOnRegistrationFirstStatus" resultType="Integer">
+        select employee_id ,count(*) as count from registration WHERE status=1 and employee_id is not null GROUP BY employee_id ORDER BY count LIMIT 1
+    </select>
+</mapper>

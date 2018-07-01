@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.MaterialSmallclazzDao">
+
+    <resultMap id="materialSmallclazzMapper" type="materialSmallclazz">
+        <id column="small_id" property="smallId"/>
+        <result column="small_name" property="smallName"/>
+        <result column="small_describe" property="smallDescribe"/>
+        <association property="materialClazz" fetchType="eager" column="big_id" select="com.sise.dao.MaterialClazzDao.findMaterClazzById" javaType="materialSmallclazz"/>
+    </resultMap>
+    <select id="findAllMaterialSmallclazz" resultMap="materialSmallclazzMapper">
+        SELECT * FROM material_smallclazz
+    </select>
+
+    <select id="findMaterialSmallclazzById" resultMap="materialSmallclazzMapper">
+        SELECT * FROM material_smallclazz WHERE small_id=#{small_id}
+    </select>
+
+    <select id="findMaterialSmallclazzByBigId" resultMap="materialSmallclazzMapper">
+        SELECT  * FROM material_smallclazz WHERE big_id=#{bigId}
+    </select>
+
+    <select id="findMaterialSmallclazzBySearchMaterialClazz" resultMap="materialSmallclazzMapper">
+        SELECT * FROM material_smallclazz
+        <where>
+            <if test="searchContent!=''">
+                small_id LIKE concat('%',#{searchContent},'%')
+                OR small_name LIKE concat('%',#{searchContent},'%')
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertMaterialSmallclazz" parameterType="materialSmallclazz">
+        INSERT INTO material_smallclazz(small_name, small_describe, big_id) VALUES (#{smallName},#{smallDescribe},#{bigId})
+    </insert>
+
+    <update id="updateMaterialSmallclazz" parameterType="materialSmallclazz">
+        UPDATE material_smallclazz SET small_name=#{smallName},small_describe=#{smallDescribe},big_id=#{bigId}
+        WHERE small_id = #{smallId}
+    </update>
+
+    <delete id="delMaterialSmallclazz" parameterType="Integer">
+        DELETE FROM material_smallclazz WHERE small_id=#{smallId}
+    </delete>
+
+    <delete id="delMaterialSmallclazzByBigId" parameterType="Integer">
+        DELETE FROM material_smallclazz WHERE big_id=#{bigId}
+    </delete>
+
+
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.MaterialDao">
+    <resultMap id="materialMapper" type="material">
+        <id property="materialId" column="material_id"/>
+        <result column="material_name" property="materialName"/>
+        <result property="materialDescribe" column="material_describe"/>
+        <result property="materialPrice" column="material_price"/>
+        <result property="materialStandard" column="material_standard"/>
+        <result property="materialCompany" column="material_company"/>
+        <result property="materialBrand" column="material_brand"/>
+        <result property="uploadTime" column="upload_time"/>
+        <result property="version" column="version"/>
+        <association property="materialOffer" column="offer_id" fetchType="eager" select="com.sise.dao.MaterialOfferDao.findMaterialOfferById" />
+        <association property="materialSmallclazz" column="small_id" fetchType="eager" select="com.sise.dao.MaterialSmallclazzDao.findMaterialSmallclazzById" />
+    </resultMap>
+
+
+    <select id="findMaterialyById" resultMap="materialMapper">
+        SELECT * FROM material WHERE material_id = #{materialId}
+    </select>
+
+    <select id="findMaterialFileByMaterialId" resultType="materialFile">
+        SELECT * FROM material_file WHERE material_id = #{materialId}
+    </select>
+
+    <insert id="insertMaterial" parameterType="material" useGeneratedKeys="true" keyProperty="materialId" >
+
+        INSERT INTO material(material_name, material_describe, material_price, material_standard, material_company, material_brand, offer_id, small_id, upload_time)
+        VALUES (#{materialName},#{materialDescribe},#{materialPrice},#{materialStandard},#{materialCompany},#{materialBrand},#{materialOffer.offerId},#{materialSmallclazz.smallId},#{uploadTime})
+    </insert>
+
+    <delete id="delMaterialById" parameterType="Integer">
+        DELETE FROM material WHERE material_id=#{materialId}
+    </delete>
+
+    <insert id="insertMaterialFile" parameterType="materialFile">
+        INSERT INTO material_file( file_name, file_url, material_Id) VALUES (#{fileName},#{fileUrl},#{materialId})
+    </insert>
+
+    <select id="getVersionById" resultType="Integer">
+        SELECT version FROM material WHERE material_id = #{materialId}
+    </select>
+
+    <select id="findAllMaterial" resultMap="materialMapper">
+        SELECT material_id,material_name, material_describe, material_price, material_standard, material_company, material_brand, offer_id, m.small_id, upload_time
+        FROM material m JOIN material_smallclazz ms ON m.small_id=ms.small_id JOIN material_clazz mc ON ms.big_id = mc.big_id
+        WHERE 1=1
+        <if test="materialName!=''">
+            AND material_name LIKE concat('%',#{materialName},'%')
+        </if>
+        <if test="offerId!=0">
+            AND offer_id= #{offerId}
+        </if>
+        <if test="smallId!=0 and bigId !=0">
+            AND m.small_id = #{smallId}
+        </if>
+        <if test="bigId !=0">
+            And mc.big_id = #{bigId}
+        </if>
+         ORDER BY material_id
+    </select>
+
+    <update id="updateMaterial" parameterType="material">
+        UPDATE material SET material_name = #{materialName}, material_describe =#{materialDescribe}, material_price=#{materialPrice}, material_standard=#{materialStandard},
+            material_company=#{materialCompany}, material_brand=#{materialBrand}, offer_id=#{materialOffer.offerId}, small_id=#{materialSmallclazz.smallId}, upload_time=#{uploadTime},version=#{version}
+        WHERE material_id =#{materialId}
+    </update>
+
+    <delete id="delAllMaterialFileByMaterialId" parameterType="Integer">
+        DELETE FROM material_file WHERE material_Id = #{materialId}
+    </delete>
+
+    <select id="findMaterialBySmallId" resultMap="materialMapper">
+        SELECT * FROM material WHERE small_id = #{smallId}
+    </select>
+
+    <delete id="delMaterialBySmallId" parameterType="Integer">
+        DELETE FROM material WHERE small_id=#{smallId}
+    </delete>
+
+</mapper>

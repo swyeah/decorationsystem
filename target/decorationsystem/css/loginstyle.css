@@ -1,0 +1,18 @@
+
+.container{
+    padding:0 10% 0 10%;
+}
+.fa{
+    display: inline-block;
+    left: 6px;
+    position: relative;
+    color: #ccc;
+}
+input[type="text"],
+input[type="password"]{
+    padding-left:26px;
+}
+.red{
+    font-size:95%;
+    color: red;
+}

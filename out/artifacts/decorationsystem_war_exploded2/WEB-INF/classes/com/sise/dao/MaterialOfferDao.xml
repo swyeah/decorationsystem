@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.MaterialOfferDao">
+
+    <select id="findAllMaterialOffer" resultType="materialOffer">
+        SELECT * FROM material_offer
+    </select>
+
+    <select id="findMaterialOfferById" resultType="materialOffer">
+        SELECT * FROM material_offer WHERE offer_id=#{offer_id}
+    </select>
+
+    <insert id="insertMaterialOffer" parameterType="materialOffer">
+        insert into material_offer ( offer_name, offer_phone, offer_address)
+        values ( #{offerName},#{offerPhone},#{offerAddress});
+    </insert>
+
+    <update id="updateMaterialOffer" parameterType="materialOffer">
+        UPDATE material_offer SET offer_name=#{offerName},offer_address=#{offerAddress},offer_phone=#{offerPhone}
+        WHERE offer_id=#{offerId}
+    </update>
+
+    <delete id="delMaterialOffer" parameterType="Integer">
+        DELETE FROM material_offer WHERE offer_id=#{offerId}
+    </delete>
+
+    <select id="findMaterialOfferBySearchContent" resultType="materialOffer">
+        SELECT * FROM material_offer
+        <where>
+            <if test="searchContent!=''">
+                offer_id LIKE concat('%',#{searchContent},'%')
+                OR offer_phone LIKE concat('%',#{searchContent},'%')
+                OR offer_name LIKE concat('%',#{searchContent},'%')
+                OR offer_address LIKE concat('%',#{searchContent},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findMaterialByOfferId" resultMap="com.sise.dao.MaterialDao.materialMapper">
+        SELECT * FROM material WHERE offer_id = #{offerId}
+    </select>
+
+
+
+
+</mapper>

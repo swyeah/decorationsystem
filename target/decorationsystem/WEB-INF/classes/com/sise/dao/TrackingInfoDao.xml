@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sise.dao.TrackingInfoDao">
+    <resultMap id="trackingInfoMapper" type="trackingInfo">
+        <id column="info_id" property="infoId"/>
+        <result column="info_content" property="infoContent"/>
+        <result column="info_time" property="infoTime"/>
+        <result column="registration_Id" property="registrationId"/>
+        <result column="info_type" property="infoType"/>
+        <result column="is_warning" property="warning"/>
+        <result column="business_status" property="businessStatus"/>
+        <association property="employee" column="employee_id" fetchType="eager" select="com.sise.dao.RegistrationTableDao.findEmployeeById" javaType="com.sise.po.Employee"/>
+    </resultMap>
+
+    <select id="findTrackingInfoByRegistrationId" resultMap="trackingInfoMapper">
+        SELECT * FROM tracking_info WHERE registration_id = #{registrationId} ORDER BY info_time DESC
+    </select>
+
+    <select id="findTrackingInfoByInfoId" resultMap="trackingInfoMapper">
+        SELECT * FROM tracking_info WHERE info_id = #{infoId}
+    </select>
+
+    <insert id="insertTrackingInfo" parameterType="trackingInfo">
+        INSERT INTO tracking_info(info_content,info_time,employee_id,registration_id,info_type,is_warning,business_status) VALUES (#{infoContent},#{infoTime},#{employeeId},#{registrationId},#{infoType},#{warning},#{businessStatus})
+    </insert>
+
+    <update id="updateTrackingInfoById" parameterType="trackingInfo">
+        UPDATE tracking_info set info_content = #{infoContent},info_type = #{infoType},is_warning = #{isWarning},business_status =#{businessStatus} WHERE info_id = #{infoId}
+    </update>
+
+    <select id="countWarning" resultType="Integer">
+        SELECT count(info_id) FROM tracking_info WHERE is_warning = 1 AND registration_id = #{registrationId}
+    </select>
+
+    <select id="countInfoAll" resultType="Integer">
+        SELECT count(info_id) FROM tracking_info WHERE registration_id = #{registrationId}
+    </select>
+</mapper>
